@@ -1,36 +1,42 @@
 % github.com/jonesc10/2ellipses-and-beyond
 
 % How many points for each curve:
-POINTS = 20000;
+POINTS = 200000;
 % Starting radii of 2 concentric  circles:
 A = 7;
 B = 10;
 % How deep do you want to go?
-ITERATIONS = 2;
+ITERATIONS = 100;
 % Generate theta values in radians
 thetas = linspace(0, pi/2, POINTS)';
 
 % Generate initial points
-ellipse1 = ellipse(A,B);
-ellipse2 = ellipse(B,A);
-Axys = zeros(POINTS,2);
-Bxys = zeros(POINTS,2);
+ellipse1 = circle(A);
+ellipse2 = circle(B);
+E1 = zeros(POINTS,2);
+E2 = zeros(POINTS,2);
 for i = 1:POINTS
     E1(i,:) = ellipse1(thetas(i));
     E2(i,:) = ellipse2(thetas(i));
 end
+X1 = E1(:,1); Y1 = E1(:,2); X2 = E2(:,1); Y2 = E2(:,2);
 % Done with initial point generation
 
-[X1,Y1,X2,Y2] = generatePoints(E1,E2);
 
-
-hold on;
-pbaspect([1 1 1]);
-% plot(E1(:,1),E1(:,2));
-% plot(E2(:,1),E2(:,2));
-
-plot(X1,Y1);
-plot(X2,Y2);
+for i = 1:ITERATIONS
+    % Keep track of previous iteration's points:
+    pX1 = X1; pY1 = Y1; pX2 = X2; pY2 = Y2;
+    [X1,Y1,X2,Y2] = generatePoints([pX1,pY1],[pX2,pY2]);
+    clf;
+    hold on;
+    pbaspect([1 1 1]);
+    plot(pX1,pY1,'r');
+    plot(pX2,pY2,'r');
+    pause;
+    plot(X1,Y1,'b');
+    plot(X2,Y2,'b');
+    pause;
+end
 
 
 function [X1,Y1,X2,Y2] = generatePoints(Axys,Bxys)
@@ -52,6 +58,8 @@ function [X1,Y1,X2,Y2] = generatePoints(Axys,Bxys)
             curB = curB + 1;
         end
     end
+    newA = newA(1:curI-1,:);
+    newB = newB(1:curI-1,:);
     
     X1 = newA(:,1);
     Y1 = newA(:,2);
